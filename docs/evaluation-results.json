@@ -1,0 +1,78 @@
+{
+  "dataset": "synthetic-v1",
+  "measured_at_utc": "2026-10-16T05:11:37.947927+00:00",
+  "notice": "Small hand-labeled synthetic sanity benchmark; not evidence of accuracy on real student resumes.",
+  "keyword_extraction": {
+    "cases": 10,
+    "true_positive": 18,
+    "false_positive": 0,
+    "false_negative": 0,
+    "precision": 1.0,
+    "recall": 1.0,
+    "mean_latency_ms": 0.8785199956037104
+  },
+  "normalization": {
+    "correct": 9,
+    "cases": 9
+  },
+  "local_llm_comparison": {
+    "status": "not_run",
+    "reason": "Optional local model experiment must be run separately with installed model weights. No LLM result is inferred from fallback output."
+  },
+  "retrieval": {
+    "method": "keyword",
+    "queries": 4,
+    "positive_queries": 3,
+    "negative_queries": 1,
+    "correct_abstentions": 1,
+    "precision_at_1": 1.0,
+    "recall_at_1": 1.0,
+    "source_citation_accuracy": 1.0,
+    "extractive_groundedness": 1.0,
+    "unsupported_excerpt_frequency": 0.0,
+    "definition": "Groundedness measures exact excerpt inclusion, not semantic correctness of an LLM or source authenticity."
+  },
+  "vector_hybrid_comparison": {
+    "status": "not_run",
+    "reason": "Requires cached Sentence Transformers weights and a running Qdrant service; keyword scores are not vector scores."
+  },
+  "agent_workflows": {
+    "tasks": 3,
+    "completed": 3,
+    "completion_rate": 1.0,
+    "mean_latency_ms": 782.5000666780397,
+    "provider": "deterministic_fallback"
+  },
+  "roadmap_comparison": {
+    "generic_target_overlap": 0.0,
+    "drive_specific_target_overlap": 0.6666666666666666,
+    "completed_tasks_before": 1,
+    "completed_tasks_preserved": 1,
+    "new_effort_hours": 3,
+    "hours_budget": 3,
+    "definition": "Exact required-skill overlap of unfinished tasks in one synthetic scenario, not measured learning improvement or a placement outcome."
+  },
+  "objective_grading": {
+    "cases": 6,
+    "correct": 6,
+    "accuracy": 1.0
+  },
+  "csv_import_reliability": {
+    "status": "passed",
+    "rows_asserted": 1000,
+    "source": "data/backend-results.xml: test_complete_1000_student_acceptance_flow",
+    "end_to_end_case_seconds": 45.237,
+    "notice": "Includes activation, resume and drive steps; not isolated import throughput."
+  },
+  "tenant_isolation": {
+    "named_cases": [
+      "test_complete_1000_student_acceptance_flow",
+      "test_resume_graph_assessment_adaptation_and_boundaries",
+      "test_evidence_sources_approval_expiry_and_tenant_filters",
+      "test_vector_tenant_filter_and_revalidated_approval"
+    ],
+    "passed": 4,
+    "source": "data/backend-results.xml",
+    "notice": "Negative API/adapter cases; not an independent penetration test."
+  }
+}

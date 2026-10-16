@@ -1,0 +1,22 @@
+# Opt-in: docker compose -f docker-compose.yml -f docker-compose.ai.yml --profile ai up --build -d
+services:
+  api:
+    build:
+      dockerfile: infra/api-ai.Dockerfile
+    environment:
+      AI_MODE: ollama
+      EMBEDDING_MODE: sentence_transformers
+      HF_HOME: /workspace/data/models
+    volumes:
+      - campusmind-model-cache:/workspace/data/models
+  worker:
+    build:
+      dockerfile: infra/api-ai.Dockerfile
+    environment:
+      AI_MODE: ollama
+      EMBEDDING_MODE: sentence_transformers
+      HF_HOME: /workspace/data/models
+    volumes:
+      - campusmind-model-cache:/workspace/data/models
+volumes:
+  campusmind-model-cache:

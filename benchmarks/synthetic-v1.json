@@ -1,0 +1,32 @@
+{
+  "version": "synthetic-v1",
+  "notice": "Small hand-labeled synthetic sanity benchmark; not evidence of accuracy on real student resumes.",
+  "resumes": [
+    {"text": "Python and SQL project: student record queries.", "skills": ["Python", "SQL"]},
+    {"text": "Built a dashboard with React, TypeScript and Git.", "skills": ["React", "TypeScript", "Git"]},
+    {"text": "Required practice: C#, .NET and SQL Server.", "skills": ["C#", ".NET", "SQL", "SQL Server"]},
+    {"text": "Learning Python; beginner only.", "skills": ["Python"]},
+    {"text": "No Java experience; interested in JavaScript.", "skills": ["Java", "JavaScript"]},
+    {"text": "Projects: campus gardening; no technical claims.", "skills": []},
+    {"text": "Studied algorithms and relational database concepts.", "skills": ["DSA", "Database fundamentals"]},
+    {"text": "Used python3 and react.js for a synthetic portal.", "skills": ["Python", "React"]},
+    {"text": "I collaborated with a team and wrote a report.", "skills": []},
+    {"text": "Version control with Git; quantitative reasoning practice.", "skills": ["Git", "Aptitude"]}
+  ],
+  "normalization": [
+    ["csharp", "C#"], ["ASP.NET Core", ".NET"], ["mssql", "SQL Server"],
+    ["python3", "Python"], ["ECMAScript", "JavaScript"], ["react.js", "React"],
+    ["algorithms", "DSA"], ["dbms", "Database fundamentals"], ["unknown skill", null]
+  ],
+  "documents": [
+    {"key": "faculty", "title": "Synthetic faculty development", "text": "Faculty development evidence: the CSE department held a database workshop in September. Synthetic attendance was twelve faculty members."},
+    {"key": "placements", "title": "Synthetic placement outcomes", "text": "Placement outcomes evidence: fictional Northstar Labs made three offers in a demonstration recruitment drive."},
+    {"key": "projects", "title": "Synthetic department projects", "text": "Department project evidence: students built a solar irrigation prototype with a soil moisture sensor."}
+  ],
+  "queries": [
+    {"question": "faculty database workshop attendance", "relevant": ["faculty"]},
+    {"question": "Northstar placement offers", "relevant": ["placements"]},
+    {"question": "solar irrigation sensor prototype", "relevant": ["projects"]},
+    {"question": "quantum scholarship awards", "relevant": []}
+  ]
+}

@@ -1,0 +1,108 @@
+name: campusmind
+x-api: &api
+  build:
+    context: .
+    dockerfile: infra/api.Dockerfile
+  env_file: .env
+  environment: &api-env
+    DATABASE_URL: postgresql+psycopg://campusmind_app:${APP_DB_PASSWORD:?Run scripts/setup_env.py first}@postgres:5432/campusmind
+    REDIS_URL: redis://redis:6379/0
+    SMTP_HOST: mailpit
+    STORAGE_ROOT: /workspace/data/storage
+    QUEUE_MODE: rq
+    RATE_LIMIT_BACKEND: redis
+    OLLAMA_URL: http://ollama:11434
+    QDRANT_URL: http://qdrant:6333
+    GRAPH_CHECKPOINT_URL: postgresql://campusmind_app:${APP_DB_PASSWORD}@postgres:5432/campusmind
+  volumes:
+    - campusmind-storage:/workspace/data/storage
+  depends_on:
+    postgres:
+      condition: service_healthy
+    redis:
+      condition: service_healthy
+    mailpit:
+      condition: service_started
+  security_opt:
+    - no-new-privileges:true
+
+services:
+  ollama:
+    image: ollama/ollama:0.40.5
+    environment:
+      OLLAMA_NO_CLOUD: "1"
+    profiles: ["ai"]
+    ports: ["127.0.0.1:11434:11434"]
+    volumes: ["campusmind-models:/root/.ollama"]
+  qdrant:
+    image: qdrant/qdrant:v1.19.2
+    profiles: ["ai"]
+    ports: ["127.0.0.1:6333:6333"]
+    volumes: ["campusmind-vectors:/qdrant/storage"]
+  postgres:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_USER: campusmind_owner
+      POSTGRES_DB: campusmind
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Run scripts/setup_env.py first}
+      APP_DB_PASSWORD: ${APP_DB_PASSWORD:?Run scripts/setup_env.py first}
+    ports: ["127.0.0.1:5432:5432"]
+    volumes:
+      - campusmind-postgres:/var/lib/postgresql/data
+      - ./infra/init-db.sh:/docker-entrypoint-initdb.d/01-app-user.sh:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U campusmind_owner -d campusmind"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+  redis:
+    image: redis:7.2-alpine
+    command: ["redis-server", "--appendonly", "yes"]
+    ports: ["127.0.0.1:6379:6379"]
+    volumes: ["campusmind-redis:/data"]
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 15
+  mailpit:
+    image: axllent/mailpit:v1.27
+    ports: ["127.0.0.1:1025:1025", "127.0.0.1:8025:8025"]
+  migrate:
+    <<: *api
+    command: ["alembic", "-c", "services/api/alembic.ini", "upgrade", "head"]
+    restart: "no"
+  api:
+    <<: *api
+    ports: ["127.0.0.1:8000:8000"]
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/api/health')"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+  worker:
+    <<: *api
+    command: ["python", "services/worker/run.py"]
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+  web:
+    build:
+      context: .
+      dockerfile: infra/web.Dockerfile
+      args:
+        API_INTERNAL_URL: http://api:8000
+    ports: ["127.0.0.1:3000:3000"]
+    depends_on:
+      api:
+        condition: service_healthy
+    security_opt: ["no-new-privileges:true"]
+volumes:
+  campusmind-postgres:
+  campusmind-redis:
+  campusmind-storage:
+  campusmind-models:
+  campusmind-vectors:

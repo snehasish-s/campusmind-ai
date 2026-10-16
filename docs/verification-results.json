@@ -1,0 +1,74 @@
+{
+  "recorded_at_utc": "2026-10-16T06:45:52.874917+00:00",
+  "backend": {
+    "tests": 37,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "time": 100.441
+  },
+  "browser": {
+    "tests": 14,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "time": 81.638519
+  },
+  "npm_advisories": {
+    "info": 0,
+    "low": 0,
+    "moderate": 0,
+    "high": 0,
+    "critical": 0,
+    "total": 0
+  },
+  "verified_checks": [
+    "Next.js production build",
+    "TypeScript typecheck",
+    "ESLint",
+    "Ruff",
+    "Alembic upgrade/check on local SQLite",
+    "PostgreSQL migrations compiled to offline SQL",
+    "Base and AI Docker Compose configuration validation",
+    "pip check",
+    "Python startup-script compilation",
+    "Synthetic benchmark",
+    "Retention dry run"
+  ],
+  "not_verified": [
+    "Live PostgreSQL server and distributed Redis/RQ/Mailpit stack: Docker Linux engine unavailable",
+    "Real Ollama inference and Sentence Transformers weights: not downloaded",
+    "Remote Qdrant server: in-process adapter tested with controlled vectors only",
+    "Supabase and Render accounts: credentials intentionally blank; no deployment"
+  ],
+  "sources": [
+    "data/backend-results.xml",
+    "apps/web/test-results/browser-results.xml",
+    "docs/evaluation-results.json",
+    "docs/npm-audit.json"
+  ],
+  "campus_hub": {
+    "backend_cases": 6,
+    "browser_cases": 2,
+    "openapi_paths": 98,
+    "features": [
+      "cohort and timetable CSV/XLSX imports",
+      "targeted official updates",
+      "private attachments",
+      "subject teacher authorization",
+      "read acknowledgements",
+      "leadership publishing authority"
+    ]
+  },
+  "workspace_separation": {
+    "backend_access_cases": 7,
+    "browser_cases": 2,
+    "student_placement_years": [
+      3,
+      4
+    ],
+    "student_default": "/app/campus",
+    "placement_entry": "/app/placement",
+    "unknown_year": "denied_pending_institution_assignment"
+  }
+}

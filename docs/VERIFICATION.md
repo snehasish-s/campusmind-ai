@@ -1,0 +1,63 @@
+# Verification record
+
+Recorded 16 October 2026 with synthetic data on Windows, Python 3.13.7 and Node.js 22.19.0. Browser tests used the actual standalone Next.js production server and FastAPI API with persistent SQLite records and real document uploads.
+
+| Check | Actual result |
+|---|---|
+| Complete backend pytest suite | **37 passed**, 0 failures/errors/skips; **100.44 seconds** |
+| Complete desktop/mobile Playwright suite | **14 passed**, 0 failures/errors/skips; **81.64 seconds** |
+| Next.js production build | Passed, including standalone output |
+| TypeScript / ESLint / Ruff | Passed |
+| Local Alembic migration | Applied; check found no new upgrade operations |
+| PostgreSQL migration SQL | Compiled through the new campus migration; no live database connection |
+| Campus retention maintenance | Dry run passed; no data deleted |
+| Python source compilation | Passed |
+
+Raw results: `data/backend-results.xml` and `apps/web/test-results/browser-results.xml`. Portable results: `docs/verification-results.json`. Generated OpenAPI contains **98 API paths**. Screenshots are in `apps/web/test-results/`; the mobile Campus Hub screenshot was visually inspected.
+
+Earlier foundation checks also passed: base/AI Docker Compose manifest validation, Python dependency consistency, frontend npm audit (zero reported advisories), and the synthetic evaluation. These were recorded before the Campus Hub extension; this extension adds no dependencies. Research measurements remain in `evaluation-results.json` and `EVALUATION_FINDINGS.md`, and are not replaced by the new integration-test counts.
+
+## Backend coverage
+
+The existing acceptance flow imports 1,000 students, validates hashed single-use invitations, activates an account, edits a profile, uploads/extracts resumes, publishes/registers a drive and denies cross-college access. Regression cases cover mapping, duplicates, idempotency, CSRF, invalid files, reset/session expiration, coordinator scope, deterministic eligibility and appeals, assessment answer-key protection and marking, examiner review, skill review, adaptive plan preservation, workflow retries, evidence approval/versioning/retrieval/deletion, private storage transport, student erasure, persistent rate limiting, setup controls and CSV formula protection.
+
+Six additional Campus Hub cases cover:
+
+- Branch, section, academic year, semester and graduation-year audience matching; private principal notices by registration number.
+- Teacher permissions from current timetables; faculty/campus-office denial from placement/student-record endpoints; leadership grants and revocation.
+- Authorized private attachments, blocked other-section/college downloads, explicit acknowledgements and withdrawal.
+- Atomic cohort imports, idempotent confirmation, retained timetable versions and teacher/room/cohort conflict detection.
+- XLSX plain-value parsing and formula rejection.
+- Preservation of academic cohort fields when older onboarding CSVs omit them.
+
+An initial fixture selected a tenant without an explicit slug; it was fixed to select the alpha institution, then the full suite was rerun. The final run has no failures. One warning comes from real in-process Qdrant: payload indexes are not implemented in local mode. This does not establish remote Qdrant performance or embedding quality.
+
+## Browser coverage
+
+Seven workflows run on desktop and Pixel 7 layouts:
+
+1. Public site, navigation, live database metrics and student search.
+2. Profile editing, resume upload and published-drive browsing/application.
+3. Mapped student CSV validation and confirmation.
+4. Approved assessments, skill review, adaptive roadmaps and officer analytics.
+5. CollegeOps upload, human approval, requirement mapping, cited retrieval and report download.
+6. Admin cohort/timetable imports, authorized teacher assignment with attachment, matching student download and acknowledgement.
+
+The new flow also checks mobile document-width constraints. An initial test selector for an implicitly wrapped select was fixed to use its accessible combobox role. All 14 final workflows passed against the rebuilt app. Interrupted exploratory runs are not counted as successful checks. Component interactions are covered in browser tests; no separate isolated React test runner is claimed.
+
+## Execution boundaries
+
+The Linux Docker engine was unavailable in the earlier infrastructure checks. PostgreSQL, Redis/RQ, Mailpit, Ollama and remote Qdrant containers were not run. SMTP acceptance uses captured synthetic email. Local-model tests use a controlled stub; vector adapter tests use real in-process Qdrant with controlled vectors. Actual Ollama inference, Sentence Transformers weights and vector/hybrid quality evaluation remain unverified.
+
+Supabase Storage transport is tested with mocked HTTP. Supabase/Render credential placeholders remain blank by request: no cloud deployment or live cloud migration is claimed. Offline PostgreSQL compilation and SQLite integration tests do not substitute for those checks.
+
+Campus updates refresh by polling every 15 seconds while the hub is open, not WebSockets or device push. Timetable routing requires trusted administrative setup. Read acknowledgement is an explicit student action and does not prove that a notification was read automatically. Assignment submissions, grading and scheduled reminders are outside this extension.
+
+Before real institutional use, complete independent security/privacy review, live PostgreSQL isolation/concurrency testing, deployment/load testing, backup recovery and support operations. The small synthetic AI benchmark is not a claim of real-world student proficiency, hiring outcomes or accreditation compliance.
+
+
+## Independent workspaces and year-restricted PlacementOS
+
+Seven backend cases cover unassigned, first-, second-, third-, fourth- and fifth-year students, plus immediate permission refresh after cohort correction. Campus communication, own profile and privacy export remain available. Placement APIs deny ineligible years, including direct calls to resumes, skills, drives, assessments, analytics and agent workflows. A student cannot self-promote academic year through profile editing. Legacy acceptance fixtures now explicitly identify their synthetic placement students as fourth-year students; missing-year behavior has separate denial coverage.
+
+A seventh browser workflow runs on desktop and mobile. It verifies Campus Hub breadcrumbs and default landing, absence of PlacementOS/drive navigation for a second-year student, direct URL/API denial, and successful workspace switching for a fourth-year student. Both product workspaces retain their own navigation. The current policy applies to four-year B.Tech: third year and final year mean academic years 3 and 4.

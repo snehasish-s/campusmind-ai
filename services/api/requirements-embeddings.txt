@@ -1,0 +1,2 @@
+-r requirements-ai.txt
+sentence-transformers>=5,<6

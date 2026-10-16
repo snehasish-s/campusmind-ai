@@ -1,5 +1,6 @@
 "use client";
 import { useState } from "react";
+import Link from "next/link";
 import { useQuery } from "@tanstack/react-query";
 import {
   Megaphone,
@@ -130,6 +131,21 @@ export function CampusHub({
         }
         description="Official notices, subject assignments and academic schedules, automatically matched to your institution and cohort."
       />
+      <div className="row" style={{ marginBottom: 20 }}>
+        {student && (
+          <Button asChild>
+            <Link href="/app/today">Open my Today dashboard</Link>
+          </Button>
+        )}
+        <Button variant="outline" asChild>
+          <Link href="/app/assignments">Assignments & feedback</Link>
+        </Button>
+        {(student || admin) && (
+          <Button variant="outline" asChild>
+            <Link href="/app/fees">Fees & receipts</Link>
+          </Button>
+        )}
+      </div>
       <div className="metric-grid" style={{ marginBottom: 24 }}>
         <div className="card card-pad">
           <Megaphone size={22} />
@@ -230,6 +246,16 @@ export function CampusHub({
               <p style={{ whiteSpace: "pre-wrap", marginBlock: 14 }}>
                 {p.message}
               </p>
+              {student && (
+                <p className="hint">
+                  Why you see this: your institution and current academic cohort
+                  match this update’s audience.
+                  {p.audience.section ? ` Section ${p.audience.section}.` : ""}
+                  {p.audience.semester
+                    ? ` Semester ${p.audience.semester}.`
+                    : ""}
+                </p>
+              )}
               {p.due_at && (
                 <p>Due: {new Date(p.due_at + "Z").toLocaleString()}</p>
               )}
@@ -397,6 +423,7 @@ function Composer({
   const { busy, act } = useAction();
   const [count, setCount] = useState<number | null>(null);
   const [selected, setSelected] = useState("");
+  const [translation, setTranslation] = useState("");
   const selectedSlot = slots.find((s) => s.id === selected);
   const exact = office === "teacher";
   function body(form: HTMLFormElement) {
@@ -486,10 +513,67 @@ function Composer({
             <option value="resource">Learning resource</option>
           </select>
         </label>
-        <label className="field" style={{ gridColumn: "1 / -1" }}>
-          Message
-          <textarea name="message" required maxLength={15000} rows={4} />
-        </label>
+        <div className="field" style={{ gridColumn: "1 / -1" }}>
+          <label htmlFor="campus-message">Message</label>
+          <textarea
+            id="campus-message"
+            name="message"
+            required
+            maxLength={15000}
+            rows={4}
+          />
+          <Button
+            type="button"
+            variant="outline"
+            disabled={busy}
+            onClick={(e) => {
+              const form = e.currentTarget.closest("form")!;
+              const text = String(new FormData(form).get("message") || "");
+              void act(async () => {
+                const draft = await send<{
+                  translation: string;
+                  message?: string;
+                }>("/campus/translation-draft", { text });
+                setTranslation(draft.translation);
+                if (!draft.translation)
+                  throw new Error(
+                    draft.message || "Enter a translation manually.",
+                  );
+              }, "Translation draft ready for staff review");
+            }}
+          >
+            Draft Odia translation · local model
+          </Button>
+        </div>
+        <div className="field" style={{ gridColumn: "1 / -1" }}>
+          <label htmlFor="odia-draft">
+            Odia draft · review names, dates and amounts before adding it to the
+            message
+          </label>
+          <textarea
+            id="odia-draft"
+            lang="or"
+            value={translation}
+            onChange={(e) => setTranslation(e.target.value)}
+            rows={3}
+            placeholder="Optional: type an Odia translation or request a local-model draft."
+          />
+          <Button
+            variant="outline"
+            type="button"
+            disabled={!translation.trim()}
+            onClick={(e) => {
+              const input = e.currentTarget
+                .closest("form")
+                ?.elements.namedItem("message") as HTMLTextAreaElement;
+              input.value = `${input.value}\n\nଓଡ଼ିଆ ସୂଚନା\n${translation}`;
+              setTranslation("");
+              setCount(null);
+            }}
+          >
+            Add reviewed translation to message
+          </Button>
+        </div>
         <label className="field">
           Branch
           <select

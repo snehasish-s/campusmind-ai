@@ -200,3 +200,35 @@ flowchart LR
   H --> I[Private student feed and notifications]
   I --> J[Explicit read acknowledgement]
 ```
+
+## Academic work, consent and finance domain
+
+```mermaid
+erDiagram
+  CAMPUS_POSTS ||--o| ASSIGNMENT_POLICIES : defines
+  CAMPUS_POSTS ||--o{ ASSIGNMENT_SUBMISSIONS : receives
+  USERS ||--o{ ASSIGNMENT_SUBMISSIONS : versions
+  ASSIGNMENT_SUBMISSIONS ||--o{ SKILL_EVIDENCE : supports
+  USERS ||--o{ PASSPORT_SHARES : consents
+  INSTITUTIONS ||--|| CAMPUS_AUTOMATIONS : configures
+  CAMPUS_AUTOMATIONS ||--o{ AUTOMATION_DELIVERIES : deduplicates
+  INSTITUTIONS ||--o{ FEE_PLANS : issues
+  FEE_PLANS ||--o{ FEE_INVOICES : snapshots
+  USERS ||--o{ FEE_INVOICES : receives
+  FEE_INVOICES ||--o{ PAYMENT_ORDERS : pays
+  PAYMENT_ORDERS ||--o{ PAYMENT_WEBHOOKS : verifies
+```
+
+```mermaid
+flowchart LR
+  A[Official assignment] --> B[Exact cohort notification]
+  B --> C[Student submission and versions]
+  C --> D[Faculty rubric review]
+  D --> E[Verified evidence passport]
+  E --> F[Explainable preparation update]
+  G[Authorized fee plan] --> H[Fixed student invoices]
+  H --> I[Student initiated checkout]
+  I --> J[Server signature and capture verification]
+  J --> K[Receipt and audited ledger]
+  H --> L[Automatic due reminders]
+```

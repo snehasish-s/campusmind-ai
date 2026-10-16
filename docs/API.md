@@ -30,6 +30,11 @@ Activation/reset uses a single-use token from the URL fragment; only its hash is
 | CollegeOps tasks | `GET/POST /institutional-tasks`, `PUT /institutional-tasks/{id}?status=...`; coordinator submission, administrator approval |
 | Privacy | `GET /privacy/export`, `POST /privacy/deletion-request`, `GET /privacy/requests`, `POST /privacy/requests/{id}/erase` with explicit confirmation |
 | First setup | `POST /setup`, guarded by a private configured token and absence of existing institutions; UI at `/setup` |
+| Campus daily life | `GET /campus/today`, `GET /campus/assignments`, `PUT /campus/assignments/{id}/policy`, `POST /campus/assignments/{id}/submit`, `PUT /campus/assignments/submissions/{id}/review`, private submission `/attachment` |
+| Passports | `GET /campus/passport?student_id=...`, `GET/POST /campus/passport/shares`, `DELETE /campus/passport/shares/{id}`, expiring bearer view `/campus/passport/shared/{token}`, own `/campus/privacy/activity` |
+| Automation | `GET/PUT /campus/automations`, `POST /campus/automations/run`, `GET /campus/evidence-map`, `POST /campus/translation-draft` |
+| Finance | `GET /campus/fees`, `POST /campus/fees/plans/preview`, `POST /campus/fees/plans`, `/export`, `POST /{invoice_id}/orders`, `POST /{invoice_id}/void`, `GET /receipts/{order_id}` |
+| Payment confirmation | `/campus/fees/orders/{id}/{demo-complete,verify,refresh,reconcile}` and signed `/campus/fees/webhook`; demo never counts as real collections |
 
 The table omits the common `/api` prefix. Consult OpenAPI for exact fields and allowed values. Validation errors use 422, unauthorized sessions 401, role/CSRF rejection 403, out-of-scope records 404, and lifecycle/conflict errors 409. Transient private storage/queue failures return a safe 503 where handled.
 

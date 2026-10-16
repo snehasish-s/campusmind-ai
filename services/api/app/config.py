@@ -37,6 +37,13 @@ class Settings(BaseSettings):
     retention_days: int = 90
     deployment_mode: str = "local"
     bootstrap_token: str = ""
+    automation_enabled: bool = True
+    automation_interval_seconds: int = 60
+    payment_provider: Literal["demo", "razorpay"] = "demo"
+    razorpay_key_id: str = ""
+    razorpay_key_secret: str = ""
+    razorpay_webhook_secret: str = ""
+    payment_institution_id: str = ""
 
     @model_validator(mode="after")
     def hosted_safety(self):

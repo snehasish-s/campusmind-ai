@@ -165,7 +165,7 @@ class EvidenceReview(BaseModel):
 @router.put("/skills/{evidence_id}/review")
 def review_skill(evidence_id: str, body: EvidenceReview, user=Depends(current_user), db: Session = Depends(get_db)):
     evidence = scoped(db, SkillEvidence, user, evidence_id)
-    if evidence.user_id != user.id or evidence.payload.get("evidence_type") == "assessment_verified":
+    if evidence.user_id != user.id or evidence.payload.get("evidence_type") in {"assessment_verified", "faculty_verified"}:
         raise HTTPException(403, "Only your extracted claims can be reviewed here.")
     evidence.payload = {**evidence.payload, **body.model_dump(), "reviewed_at": now().isoformat()}
     track(db, user, "skills.reviewed", "Resume skill claim reviewed", evidence_id=evidence.id)

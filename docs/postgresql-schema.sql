@@ -838,5 +838,250 @@ DO $$ BEGIN IF EXISTS (SELECT FROM pg_roles WHERE rolname='anon') THEN EXECUTE '
 
 UPDATE alembic_version SET version_num='d7e25ded6e9f' WHERE alembic_version.version_num = 'dc91572ca3aa';
 
+-- Running upgrade d7e25ded6e9f -> 11c8ef293d85
+
+CREATE TABLE campus_automations (
+    enabled BOOLEAN NOT NULL,
+    assignments BOOLEAN NOT NULL,
+    fees BOOLEAN NOT NULL,
+    evidence BOOLEAN NOT NULL,
+    last_run_at TIMESTAMP WITHOUT TIME ZONE,
+    last_result JSON NOT NULL,
+    institution_id VARCHAR(36) NOT NULL,
+    id VARCHAR(36) NOT NULL,
+    created_at TIMESTAMP WITHOUT TIME ZONE NOT NULL,
+    PRIMARY KEY (id),
+    FOREIGN KEY(institution_id) REFERENCES institutions (id),
+    UNIQUE (institution_id)
+);
+
+CREATE INDEX ix_campus_automations_institution_id ON campus_automations (institution_id);
+
+CREATE TABLE automation_deliveries (
+    event_key VARCHAR(180) NOT NULL,
+    user_id VARCHAR(36) NOT NULL,
+    title VARCHAR NOT NULL,
+    source VARCHAR NOT NULL,
+    institution_id VARCHAR(36) NOT NULL,
+    id VARCHAR(36) NOT NULL,
+    created_at TIMESTAMP WITHOUT TIME ZONE NOT NULL,
+    PRIMARY KEY (id),
+    FOREIGN KEY(institution_id) REFERENCES institutions (id),
+    FOREIGN KEY(user_id) REFERENCES users (id),
+    UNIQUE (institution_id, event_key, user_id)
+);
+
+CREATE INDEX ix_automation_deliveries_institution_id ON automation_deliveries (institution_id);
+
+CREATE TABLE fee_plans (
+    reference VARCHAR(80) NOT NULL,
+    title VARCHAR(200) NOT NULL,
+    category VARCHAR(40) NOT NULL,
+    term VARCHAR(80) NOT NULL,
+    amount_paise INTEGER NOT NULL,
+    due_at TIMESTAMP WITHOUT TIME ZONE NOT NULL,
+    audience JSON NOT NULL,
+    created_by VARCHAR(36) NOT NULL,
+    institution_id VARCHAR(36) NOT NULL,
+    id VARCHAR(36) NOT NULL,
+    created_at TIMESTAMP WITHOUT TIME ZONE NOT NULL,
+    PRIMARY KEY (id),
+    CHECK (amount_paise > 0),
+    FOREIGN KEY(created_by) REFERENCES users (id),
+    FOREIGN KEY(institution_id) REFERENCES institutions (id),
+    UNIQUE (institution_id, reference)
+);
+
+CREATE INDEX ix_fee_plans_institution_id ON fee_plans (institution_id);
+
+CREATE TABLE passport_shares (
+    user_id VARCHAR(36) NOT NULL,
+    token_hash VARCHAR(64) NOT NULL,
+    evidence_ids JSON NOT NULL,
+    expires_at TIMESTAMP WITHOUT TIME ZONE NOT NULL,
+    revoked_at TIMESTAMP WITHOUT TIME ZONE,
+    institution_id VARCHAR(36) NOT NULL,
+    id VARCHAR(36) NOT NULL,
+    created_at TIMESTAMP WITHOUT TIME ZONE NOT NULL,
+    PRIMARY KEY (id),
+    FOREIGN KEY(institution_id) REFERENCES institutions (id),
+    FOREIGN KEY(user_id) REFERENCES users (id),
+    UNIQUE (token_hash)
+);
+
+CREATE INDEX ix_passport_shares_institution_id ON passport_shares (institution_id);
+
+CREATE INDEX ix_passport_shares_user_id ON passport_shares (user_id);
+
+CREATE TABLE assignment_policies (
+    post_id VARCHAR(36) NOT NULL,
+    rubric JSON NOT NULL,
+    skills JSON NOT NULL,
+    allow_late BOOLEAN NOT NULL,
+    institution_id VARCHAR(36) NOT NULL,
+    id VARCHAR(36) NOT NULL,
+    created_at TIMESTAMP WITHOUT TIME ZONE NOT NULL,
+    PRIMARY KEY (id),
+    FOREIGN KEY(institution_id) REFERENCES institutions (id),
+    FOREIGN KEY(post_id) REFERENCES campus_posts (id),
+    UNIQUE (post_id)
+);
+
+CREATE INDEX ix_assignment_policies_institution_id ON assignment_policies (institution_id);
+
+CREATE TABLE assignment_submissions (
+    post_id VARCHAR(36) NOT NULL,
+    user_id VARCHAR(36) NOT NULL,
+    version INTEGER NOT NULL,
+    content TEXT NOT NULL,
+    storage_key VARCHAR,
+    filename VARCHAR,
+    mime VARCHAR,
+    status VARCHAR NOT NULL,
+    late BOOLEAN NOT NULL,
+    rubric JSON NOT NULL,
+    skills JSON NOT NULL,
+    marks JSON NOT NULL,
+    score FLOAT,
+    feedback TEXT NOT NULL,
+    reviewed_by VARCHAR(36),
+    reviewed_at TIMESTAMP WITHOUT TIME ZONE,
+    institution_id VARCHAR(36) NOT NULL,
+    id VARCHAR(36) NOT NULL,
+    created_at TIMESTAMP WITHOUT TIME ZONE NOT NULL,
+    PRIMARY KEY (id),
+    FOREIGN KEY(institution_id) REFERENCES institutions (id),
+    FOREIGN KEY(post_id) REFERENCES campus_posts (id),
+    FOREIGN KEY(reviewed_by) REFERENCES users (id),
+    FOREIGN KEY(user_id) REFERENCES users (id),
+    UNIQUE (post_id, user_id, version)
+);
+
+CREATE INDEX ix_assignment_submissions_institution_id ON assignment_submissions (institution_id);
+
+CREATE INDEX ix_assignment_submissions_post_id ON assignment_submissions (post_id);
+
+CREATE INDEX ix_assignment_submissions_user_id ON assignment_submissions (user_id);
+
+CREATE TABLE fee_invoices (
+    plan_id VARCHAR(36) NOT NULL,
+    user_id VARCHAR(36) NOT NULL,
+    amount_paise INTEGER NOT NULL,
+    status VARCHAR NOT NULL,
+    paid_at TIMESTAMP WITHOUT TIME ZONE,
+    institution_id VARCHAR(36) NOT NULL,
+    id VARCHAR(36) NOT NULL,
+    created_at TIMESTAMP WITHOUT TIME ZONE NOT NULL,
+    PRIMARY KEY (id),
+    CHECK (amount_paise > 0),
+    FOREIGN KEY(institution_id) REFERENCES institutions (id),
+    FOREIGN KEY(plan_id) REFERENCES fee_plans (id),
+    FOREIGN KEY(user_id) REFERENCES users (id),
+    UNIQUE (plan_id, user_id)
+);
+
+CREATE INDEX ix_fee_invoices_institution_id ON fee_invoices (institution_id);
+
+CREATE INDEX ix_fee_invoices_user_id ON fee_invoices (user_id);
+
+CREATE TABLE payment_orders (
+    invoice_id VARCHAR(36) NOT NULL,
+    idempotency_key VARCHAR(80) NOT NULL,
+    provider VARCHAR NOT NULL,
+    environment VARCHAR NOT NULL,
+    provider_order_id VARCHAR(100),
+    provider_payment_id VARCHAR(100),
+    amount_paise INTEGER NOT NULL,
+    status VARCHAR NOT NULL,
+    receipt_number VARCHAR(80),
+    settled_at TIMESTAMP WITHOUT TIME ZONE,
+    institution_id VARCHAR(36) NOT NULL,
+    id VARCHAR(36) NOT NULL,
+    created_at TIMESTAMP WITHOUT TIME ZONE NOT NULL,
+    PRIMARY KEY (id),
+    FOREIGN KEY(institution_id) REFERENCES institutions (id),
+    FOREIGN KEY(invoice_id) REFERENCES fee_invoices (id),
+    UNIQUE (invoice_id, idempotency_key, environment),
+    UNIQUE (invoice_id, provider, environment),
+    UNIQUE (provider_order_id),
+    UNIQUE (provider_payment_id),
+    UNIQUE (receipt_number)
+);
+
+CREATE INDEX ix_payment_orders_institution_id ON payment_orders (institution_id);
+
+CREATE INDEX ix_payment_orders_invoice_id ON payment_orders (invoice_id);
+
+CREATE TABLE payment_webhooks (
+    event_id VARCHAR(180) NOT NULL,
+    order_id VARCHAR(36) NOT NULL,
+    event_type VARCHAR NOT NULL,
+    institution_id VARCHAR(36) NOT NULL,
+    id VARCHAR(36) NOT NULL,
+    created_at TIMESTAMP WITHOUT TIME ZONE NOT NULL,
+    PRIMARY KEY (id),
+    FOREIGN KEY(institution_id) REFERENCES institutions (id),
+    FOREIGN KEY(order_id) REFERENCES payment_orders (id),
+    UNIQUE (event_id)
+);
+
+CREATE INDEX ix_payment_webhooks_institution_id ON payment_webhooks (institution_id);
+
+ALTER TABLE "campus_automations" ENABLE ROW LEVEL SECURITY;
+
+REVOKE ALL ON TABLE "campus_automations" FROM PUBLIC;
+
+DO $$ BEGIN IF EXISTS (SELECT FROM pg_roles WHERE rolname='anon') THEN EXECUTE 'REVOKE ALL ON TABLE campus_automations FROM anon'; END IF; IF EXISTS (SELECT FROM pg_roles WHERE rolname='authenticated') THEN EXECUTE 'REVOKE ALL ON TABLE campus_automations FROM authenticated'; END IF; END $$;
+
+ALTER TABLE "automation_deliveries" ENABLE ROW LEVEL SECURITY;
+
+REVOKE ALL ON TABLE "automation_deliveries" FROM PUBLIC;
+
+DO $$ BEGIN IF EXISTS (SELECT FROM pg_roles WHERE rolname='anon') THEN EXECUTE 'REVOKE ALL ON TABLE automation_deliveries FROM anon'; END IF; IF EXISTS (SELECT FROM pg_roles WHERE rolname='authenticated') THEN EXECUTE 'REVOKE ALL ON TABLE automation_deliveries FROM authenticated'; END IF; END $$;
+
+ALTER TABLE "assignment_policies" ENABLE ROW LEVEL SECURITY;
+
+REVOKE ALL ON TABLE "assignment_policies" FROM PUBLIC;
+
+DO $$ BEGIN IF EXISTS (SELECT FROM pg_roles WHERE rolname='anon') THEN EXECUTE 'REVOKE ALL ON TABLE assignment_policies FROM anon'; END IF; IF EXISTS (SELECT FROM pg_roles WHERE rolname='authenticated') THEN EXECUTE 'REVOKE ALL ON TABLE assignment_policies FROM authenticated'; END IF; END $$;
+
+ALTER TABLE "assignment_submissions" ENABLE ROW LEVEL SECURITY;
+
+REVOKE ALL ON TABLE "assignment_submissions" FROM PUBLIC;
+
+DO $$ BEGIN IF EXISTS (SELECT FROM pg_roles WHERE rolname='anon') THEN EXECUTE 'REVOKE ALL ON TABLE assignment_submissions FROM anon'; END IF; IF EXISTS (SELECT FROM pg_roles WHERE rolname='authenticated') THEN EXECUTE 'REVOKE ALL ON TABLE assignment_submissions FROM authenticated'; END IF; END $$;
+
+ALTER TABLE "passport_shares" ENABLE ROW LEVEL SECURITY;
+
+REVOKE ALL ON TABLE "passport_shares" FROM PUBLIC;
+
+DO $$ BEGIN IF EXISTS (SELECT FROM pg_roles WHERE rolname='anon') THEN EXECUTE 'REVOKE ALL ON TABLE passport_shares FROM anon'; END IF; IF EXISTS (SELECT FROM pg_roles WHERE rolname='authenticated') THEN EXECUTE 'REVOKE ALL ON TABLE passport_shares FROM authenticated'; END IF; END $$;
+
+ALTER TABLE "fee_plans" ENABLE ROW LEVEL SECURITY;
+
+REVOKE ALL ON TABLE "fee_plans" FROM PUBLIC;
+
+DO $$ BEGIN IF EXISTS (SELECT FROM pg_roles WHERE rolname='anon') THEN EXECUTE 'REVOKE ALL ON TABLE fee_plans FROM anon'; END IF; IF EXISTS (SELECT FROM pg_roles WHERE rolname='authenticated') THEN EXECUTE 'REVOKE ALL ON TABLE fee_plans FROM authenticated'; END IF; END $$;
+
+ALTER TABLE "fee_invoices" ENABLE ROW LEVEL SECURITY;
+
+REVOKE ALL ON TABLE "fee_invoices" FROM PUBLIC;
+
+DO $$ BEGIN IF EXISTS (SELECT FROM pg_roles WHERE rolname='anon') THEN EXECUTE 'REVOKE ALL ON TABLE fee_invoices FROM anon'; END IF; IF EXISTS (SELECT FROM pg_roles WHERE rolname='authenticated') THEN EXECUTE 'REVOKE ALL ON TABLE fee_invoices FROM authenticated'; END IF; END $$;
+
+ALTER TABLE "payment_orders" ENABLE ROW LEVEL SECURITY;
+
+REVOKE ALL ON TABLE "payment_orders" FROM PUBLIC;
+
+DO $$ BEGIN IF EXISTS (SELECT FROM pg_roles WHERE rolname='anon') THEN EXECUTE 'REVOKE ALL ON TABLE payment_orders FROM anon'; END IF; IF EXISTS (SELECT FROM pg_roles WHERE rolname='authenticated') THEN EXECUTE 'REVOKE ALL ON TABLE payment_orders FROM authenticated'; END IF; END $$;
+
+ALTER TABLE "payment_webhooks" ENABLE ROW LEVEL SECURITY;
+
+REVOKE ALL ON TABLE "payment_webhooks" FROM PUBLIC;
+
+DO $$ BEGIN IF EXISTS (SELECT FROM pg_roles WHERE rolname='anon') THEN EXECUTE 'REVOKE ALL ON TABLE payment_webhooks FROM anon'; END IF; IF EXISTS (SELECT FROM pg_roles WHERE rolname='authenticated') THEN EXECUTE 'REVOKE ALL ON TABLE payment_webhooks FROM authenticated'; END IF; END $$;
+
+UPDATE alembic_version SET version_num='11c8ef293d85' WHERE alembic_version.version_num = 'd7e25ded6e9f';
+
 COMMIT;
 

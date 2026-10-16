@@ -1,5 +1,13 @@
 # Security and privacy design
 
+## Campus work, passport and finance controls
+
+Assignment policies freeze after the first submission. Private work is visible to its student, assignment author and institution administrators. Faculty evidence identifies the reviewer/submission; students cannot promote claims into verification. Passport shares require explicit selection and consent, hashed tokens and expiry. Public output excludes original private work and contact details.
+
+Fee APIs authorize students for their invoices and administrators for institutional billing. Faculty, campus offices and placement officers cannot inspect fee ledgers. Merchant secrets stay backend-only and are bound to an institution UUID. Integer paise, invoice snapshots, callback HMAC, provider capture checks, raw-body webhook HMAC, database locks and unique payment IDs protect accounting. Demo/test/live orders are isolated and test receipts never count as collections. No card, UPI PIN or bank credentials are handled. Refunds, disputes and settlement still require institutional merchant operations and independent review before real money use.
+
+Offline schedules are explicit device opt-in and cleared by logout. The service worker never caches private API responses or share pages. Automated rules cannot invent official notices, grades or fees. See [Campus life and fees](CAMPUS_LIFE_AND_FEES.md) for operational limits.
+
 ## Implemented controls
 
 - Institution ownership comes from the authenticated user; CSV/body tenant values never authorize access. Students see their own private records; coordinators are restricted to assigned departments; officers/admins remain institution-scoped.

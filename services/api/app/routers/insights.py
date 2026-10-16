@@ -135,7 +135,7 @@ def performance(
                 "skills": [
                     {"id": e.id, "skill": skill_names[e.skill_id], **e.payload}
                     for e in all_evidence
-                    if e.user_id == u.id and e.payload.get("status") not in {"rejected", "challenged"}
+                    if e.user_id == u.id and e.payload.get("status") not in {"rejected", "challenged", "superseded"}
                 ],
                 "trend": [{"date": a.created_at.isoformat(), "score": a.payload.get("score"), "title": a.payload["title"]} for a in taken],
             }
@@ -309,6 +309,9 @@ def personal_export(user=Depends(current_user), db: Session = Depends(get_db)):
     from .students import student_view
     from ..intelligence.assessments import attempt_view
     from ..intelligence.preparation import plan_view
+    from ..models import AssignmentSubmission, FeeInvoice, PassportShare
+    from .campus_life import submission_view
+    from .fees import invoice_view
 
     audit(db, user, "privacy.export", user.id)
     db.commit()
@@ -317,6 +320,9 @@ def personal_export(user=Depends(current_user), db: Session = Depends(get_db)):
         "skills": evidence_profile(db, user),
         "attempts": [attempt_view(a) for a in db.scalars(select(TestAttempt).where(TestAttempt.user_id == user.id))],
         "roadmaps": [plan_view(db, p) for p in db.scalars(select(LearningRoadmap).where(LearningRoadmap.user_id == user.id))],
+        "assignments": [submission_view(db, s) for s in db.scalars(select(AssignmentSubmission).where(AssignmentSubmission.user_id == user.id))],
+        "fee_invoices": [invoice_view(db, i) for i in db.scalars(select(FeeInvoice).where(FeeInvoice.user_id == user.id))],
+        "passport_shares": [{"id": s.id, "expires_at": s.expires_at, "revoked_at": s.revoked_at} for s in db.scalars(select(PassportShare).where(PassportShare.user_id == user.id))],
     }
 
 

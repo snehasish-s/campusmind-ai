@@ -45,7 +45,7 @@ def career_answer(db, user, question):
     ]
     lower = question.lower()
     if "mock interview" in lower:
-        names = list(dict.fromkeys(e["skill"] for e in evidence_profile(db, user) if e.get("status") not in {"rejected", "challenged"}))[
+        names = list(dict.fromkeys(e["skill"] for e in evidence_profile(db, user) if e.get("status") not in {"rejected", "challenged", "superseded"}))[
             :3
         ] or ["programming fundamentals"]
         answer = "Unscored interview practice based on your recorded claims:\n" + "\n".join(

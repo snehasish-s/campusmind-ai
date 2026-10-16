@@ -401,3 +401,109 @@ class CampusReceipt(Tenant, Base):
     post_id: Mapped[str] = mapped_column(ForeignKey("campus_posts.id"))
     user_id: Mapped[str] = mapped_column(ForeignKey("users.id"))
     read_at: Mapped[datetime | None]
+
+
+class AssignmentPolicy(Tenant, Base):
+    __tablename__ = "assignment_policies"
+    post_id: Mapped[str] = mapped_column(ForeignKey("campus_posts.id"), unique=True)
+    rubric: Mapped[list] = mapped_column(JSON)
+    skills: Mapped[list] = mapped_column(JSON, default=list)
+    allow_late: Mapped[bool] = mapped_column(default=False)
+
+
+class AssignmentSubmission(Tenant, Base):
+    __tablename__ = "assignment_submissions"
+    __table_args__ = (UniqueConstraint("post_id", "user_id", "version"),)
+    post_id: Mapped[str] = mapped_column(ForeignKey("campus_posts.id"), index=True)
+    user_id: Mapped[str] = mapped_column(ForeignKey("users.id"), index=True)
+    version: Mapped[int]
+    content: Mapped[str] = mapped_column(Text)
+    storage_key: Mapped[str | None]
+    filename: Mapped[str | None]
+    mime: Mapped[str | None]
+    status: Mapped[str] = mapped_column(default="submitted")
+    late: Mapped[bool] = mapped_column(default=False)
+    rubric: Mapped[list] = mapped_column(JSON)
+    skills: Mapped[list] = mapped_column(JSON, default=list)
+    marks: Mapped[list] = mapped_column(JSON, default=list)
+    score: Mapped[float | None]
+    feedback: Mapped[str] = mapped_column(Text, default="")
+    reviewed_by: Mapped[str | None] = mapped_column(ForeignKey("users.id"))
+    reviewed_at: Mapped[datetime | None]
+
+
+class CampusAutomation(Tenant, Base):
+    __tablename__ = "campus_automations"
+    __table_args__ = (UniqueConstraint("institution_id"),)
+    enabled: Mapped[bool] = mapped_column(default=True)
+    assignments: Mapped[bool] = mapped_column(default=True)
+    fees: Mapped[bool] = mapped_column(default=True)
+    evidence: Mapped[bool] = mapped_column(default=True)
+    last_run_at: Mapped[datetime | None]
+    last_result: Mapped[dict] = mapped_column(JSON, default=dict)
+
+
+class AutomationDelivery(Tenant, Base):
+    __tablename__ = "automation_deliveries"
+    __table_args__ = (UniqueConstraint("institution_id", "event_key", "user_id"),)
+    event_key: Mapped[str] = mapped_column(String(180))
+    user_id: Mapped[str] = mapped_column(ForeignKey("users.id"))
+    title: Mapped[str]
+    source: Mapped[str]
+
+
+class PassportShare(Tenant, Base):
+    __tablename__ = "passport_shares"
+    user_id: Mapped[str] = mapped_column(ForeignKey("users.id"), index=True)
+    token_hash: Mapped[str] = mapped_column(String(64), unique=True)
+    evidence_ids: Mapped[list] = mapped_column(JSON)
+    expires_at: Mapped[datetime]
+    revoked_at: Mapped[datetime | None]
+
+
+class FeePlan(Tenant, Base):
+    __tablename__ = "fee_plans"
+    __table_args__ = (UniqueConstraint("institution_id", "reference"), CheckConstraint("amount_paise > 0"))
+    reference: Mapped[str] = mapped_column(String(80))
+    title: Mapped[str] = mapped_column(String(200))
+    category: Mapped[str] = mapped_column(String(40))
+    term: Mapped[str] = mapped_column(String(80))
+    amount_paise: Mapped[int]
+    due_at: Mapped[datetime]
+    audience: Mapped[dict] = mapped_column(JSON)
+    created_by: Mapped[str] = mapped_column(ForeignKey("users.id"))
+
+
+class FeeInvoice(Tenant, Base):
+    __tablename__ = "fee_invoices"
+    __table_args__ = (UniqueConstraint("plan_id", "user_id"), CheckConstraint("amount_paise > 0"))
+    plan_id: Mapped[str] = mapped_column(ForeignKey("fee_plans.id"))
+    user_id: Mapped[str] = mapped_column(ForeignKey("users.id"), index=True)
+    amount_paise: Mapped[int]
+    status: Mapped[str] = mapped_column(default="unpaid")
+    paid_at: Mapped[datetime | None]
+
+
+class PaymentOrder(Tenant, Base):
+    __tablename__ = "payment_orders"
+    __table_args__ = (
+        UniqueConstraint("invoice_id", "idempotency_key", "environment"),
+        UniqueConstraint("invoice_id", "provider", "environment"),
+    )
+    invoice_id: Mapped[str] = mapped_column(ForeignKey("fee_invoices.id"), index=True)
+    idempotency_key: Mapped[str] = mapped_column(String(80))
+    provider: Mapped[str]
+    environment: Mapped[str]
+    provider_order_id: Mapped[str | None] = mapped_column(String(100), unique=True)
+    provider_payment_id: Mapped[str | None] = mapped_column(String(100), unique=True)
+    amount_paise: Mapped[int]
+    status: Mapped[str] = mapped_column(default="created")
+    receipt_number: Mapped[str | None] = mapped_column(String(80), unique=True)
+    settled_at: Mapped[datetime | None]
+
+
+class PaymentWebhook(Tenant, Base):
+    __tablename__ = "payment_webhooks"
+    event_id: Mapped[str] = mapped_column(String(180), unique=True)
+    order_id: Mapped[str] = mapped_column(ForeignKey("payment_orders.id"))
+    event_type: Mapped[str]

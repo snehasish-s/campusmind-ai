@@ -277,7 +277,9 @@ export function SkillsPage() {
                 <h2>{e.skill}</h2>
                 <Badge
                   tone={
-                    e.evidence_type === "assessment_verified"
+                    ["assessment_verified", "faculty_verified"].includes(
+                      e.evidence_type,
+                    )
                       ? "green"
                       : "amber"
                   }
@@ -300,7 +302,9 @@ export function SkillsPage() {
                 </p>
               )}
               {e.note && <p>{e.note}</p>}
-              {e.evidence_type !== "assessment_verified" && (
+              {!["assessment_verified", "faculty_verified"].includes(
+                e.evidence_type,
+              ) && (
                 <div
                   className="row"
                   style={{ flexWrap: "wrap", marginTop: 16 }}

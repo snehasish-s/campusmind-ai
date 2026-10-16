@@ -61,7 +61,7 @@ All mutations use existing session and CSRF protections. PostgreSQL migration al
 
 ## Practical boundaries
 
-Routing is automatic after authorized setup/publication. The system does not invent official notices, discover teachers without a roster, infer semester promotions from dates or autonomously grant publishing authority. These trusted inputs are necessary to prevent incorrect distribution. Assignment distribution and deadlines are implemented; assignment submissions, marking, attendance, push notifications and scheduled deadline reminders are future extensions. No LLM or paid service is required.
+Routing is automatic after authorized setup/publication. The system does not invent official notices, discover teachers without a roster, infer semester promotions from dates or autonomously grant publishing authority. These trusted inputs are necessary to prevent incorrect distribution. Assignment submissions, marking and scheduled reminders are implemented in the [campus life extension](CAMPUS_LIFE_AND_FEES.md). Attendance and background Web Push remain future work. No LLM or paid service is required for campus communication.
 
 ## Workspace separation and PlacementOS admission
 

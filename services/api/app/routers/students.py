@@ -71,7 +71,10 @@ def students(
 
 @router.get("/students/{student_id}")
 def student(student_id: str, user=Depends(current_user), db: Session = Depends(get_db)):
-    return student_view(db, student_access(db, user, student_id))
+    target = student_access(db, user, student_id)
+    audit(db, user, "student.profile_read", target.id)
+    db.commit()
+    return student_view(db, target)
 
 
 @router.get("/profile")
@@ -166,7 +169,7 @@ async def upload_resume(file: UploadFile = File(...), user=Depends(current_user)
 def download_resume(resume_id: str, user=Depends(current_user), db: Session = Depends(get_db)):
     resume = scoped(db, Resume, user, resume_id)
     student_access(db, user, resume.user_id)
-    audit(db, user, "resume.download", resume.id)
+    audit(db, user, "resume.download", resume.user_id, {"resume_id": resume.id})
     db.commit()
     return document_response(resume.storage_key, resume.filename, resume.mime_type)
 
@@ -175,6 +178,6 @@ def download_resume(resume_id: str, user=Depends(current_user), db: Session = De
 def resume_text(resume_id: str, user=Depends(current_user), db: Session = Depends(get_db)):
     resume = scoped(db, Resume, user, resume_id)
     student_access(db, user, resume.user_id)
-    audit(db, user, "resume.text_read", resume.id)
+    audit(db, user, "resume.text_read", resume.user_id, {"resume_id": resume.id})
     db.commit()
     return {"text": get_storage().read(resume.text_key).decode("utf-8"), "status": resume.extraction_status}

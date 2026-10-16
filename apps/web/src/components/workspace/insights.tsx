@@ -392,9 +392,11 @@ export function AnalyticsPage({ user }: { user: User }) {
                           <td key={skill}>
                             <Badge
                               tone={
-                                evidence.some(
-                                  (e) =>
-                                    e.evidence_type === "assessment_verified",
+                                evidence.some((e) =>
+                                  [
+                                    "assessment_verified",
+                                    "faculty_verified",
+                                  ].includes(e.evidence_type),
                                 )
                                   ? "green"
                                   : evidence.length
@@ -402,9 +404,11 @@ export function AnalyticsPage({ user }: { user: User }) {
                                     : "neutral"
                               }
                             >
-                              {evidence.some(
-                                (e) =>
-                                  e.evidence_type === "assessment_verified",
+                              {evidence.some((e) =>
+                                [
+                                  "assessment_verified",
+                                  "faculty_verified",
+                                ].includes(e.evidence_type),
                               )
                                 ? "Demonstrated"
                                 : evidence.length

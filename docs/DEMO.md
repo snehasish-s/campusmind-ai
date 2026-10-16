@@ -1,5 +1,9 @@
 # Final-year project demonstration
 
+## Campus life and fees extension
+
+After migration, run `scripts/seed_campus.py` against the fictional demo institution. Save its randomly generated student and teacher passwords. As `CAMPUSSTUDENT`, open Today, inspect the timetable and synthetic fee invoice, then submit SQL work in Assignments. As `TEACHER001`, review the submission with rubric marks and explicit mapped-skill verification. The student sees feedback and the evidence passport, can select records, consent to an expiring share and revoke it. As admin, demonstrate cohort fee preview/issue, reminder settings and delivery history. As student, review the fee and confirm the clearly labelled demo payment, download a TEST receipt and show that real collections remain zero. Save an offline timetable snapshot and open `/offline`. Never demonstrate a real charge without an authorized institution merchant account.
+
 Use fictional records only. Start with README's installation and seed steps. Passwords are chosen locally or generated uniquely; no shared demo credential is embedded in source. For a short presentation, import a small preview first, then demonstrate the full `data/synthetic-students.csv` operation.
 
 ## A — Bulk onboarding

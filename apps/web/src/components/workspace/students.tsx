@@ -51,6 +51,21 @@ export function StudentsPage({ user }: { user: User }) {
       ),
     enabled: !!selected,
   });
+  const passport = useQuery({
+    queryKey: ["student-passport", selected?.id],
+    queryFn: () =>
+      api<{
+        evidence: {
+          id: string;
+          skill: string;
+          evidence_type: string;
+          status: string;
+          score?: number;
+          quote?: string;
+        }[];
+      }>(`/campus/passport?student_id=${selected!.id}`),
+    enabled: !!selected,
+  });
   async function invite(action: string) {
     if (!selected) return;
     setPending(true);
@@ -306,6 +321,22 @@ export function StudentsPage({ user }: { user: User }) {
               <p className="hint">No resume uploaded yet.</p>
             )}
             <MatchingPanel studentId={selected.id} />
+            <div className="divider" />
+            <h3>Academic & placement evidence passport</h3>
+            {passport.isPending && <Skeleton rows={2} />}
+            {passport.error && <Failure error={passport.error} />}
+            {passport.data?.evidence.map((e) => (
+              <div className="passport-evidence" key={e.id}>
+                <strong>{e.skill}</strong>{" "}
+                <Badge>{e.evidence_type.replaceAll("_", " ")}</Badge>{" "}
+                <Badge>{e.status}</Badge>
+                {e.score !== undefined && <p>Recorded score: {e.score}%</p>}
+                {e.quote && <p className="hint">{e.quote}</p>}
+              </div>
+            ))}
+            {passport.data?.evidence.length === 0 && (
+              <p className="hint">No skill evidence recorded yet.</p>
+            )}
             {selected.active &&
               ["institution_admin", "platform_admin"].includes(user.role) && (
                 <div className="card card-pad" style={{ marginTop: 18 }}>

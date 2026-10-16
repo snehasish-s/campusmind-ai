@@ -17,6 +17,7 @@ COPY services/api/ services/api/
 COPY infra/render_start.py infra/render_start.py
 COPY --from=web-build /build/.next/standalone ./web
 COPY --from=web-build /build/.next/static ./web/.next/static
+COPY --from=web-build /build/public ./web/public
 RUN useradd --create-home campusmind && chown -R campusmind:campusmind /app
 USER campusmind
 EXPOSE 10000

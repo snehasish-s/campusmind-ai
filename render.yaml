@@ -38,3 +38,9 @@ services:
         value: "false"
       - key: SMTP_HOST
         value: ""
+      - key: AUTOMATION_ENABLED
+        value: "true"
+      - key: AUTOMATION_INTERVAL_SECONDS
+        value: "60"
+      - key: PAYMENT_PROVIDER
+        value: demo

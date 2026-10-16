@@ -2,8 +2,8 @@
   "openapi": "3.1.0",
   "info": {
     "title": "CampusMind AI",
-    "description": "Tenant-isolated CollegeOps and PlacementOS. No LLM required.",
-    "version": "0.1.0"
+    "description": "Tenant-isolated CollegeOps, Campus Hub and PlacementOS. No LLM required.",
+    "version": "0.2.0"
   },
   "paths": {
     "/api/health": {
@@ -4256,6 +4256,1045 @@
           }
         }
       }
+    },
+    "/api/campus/today": {
+      "get": {
+        "tags": [
+          "Campus daily life, assignments and evidence passports"
+        ],
+        "summary": "Today",
+        "operationId": "today_api_campus_today_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/campus/assignments/{post_id}/policy": {
+      "put": {
+        "tags": [
+          "Campus daily life, assignments and evidence passports"
+        ],
+        "summary": "Policy",
+        "operationId": "policy_api_campus_assignments__post_id__policy_put",
+        "parameters": [
+          {
+            "name": "post_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Post Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PolicyInput"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/campus/assignments": {
+      "get": {
+        "tags": [
+          "Campus daily life, assignments and evidence passports"
+        ],
+        "summary": "Assignments",
+        "operationId": "assignments_api_campus_assignments_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/campus/assignments/{post_id}/submit": {
+      "post": {
+        "tags": [
+          "Campus daily life, assignments and evidence passports"
+        ],
+        "summary": "Submit",
+        "operationId": "submit_api_campus_assignments__post_id__submit_post",
+        "parameters": [
+          {
+            "name": "post_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Post Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "$ref": "#/components/schemas/Body_submit_api_campus_assignments__post_id__submit_post"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/campus/assignments/submissions/{submission_id}/attachment": {
+      "get": {
+        "tags": [
+          "Campus daily life, assignments and evidence passports"
+        ],
+        "summary": "Submission File",
+        "operationId": "submission_file_api_campus_assignments_submissions__submission_id__attachment_get",
+        "parameters": [
+          {
+            "name": "submission_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Submission Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/campus/assignments/submissions/{submission_id}/review": {
+      "put": {
+        "tags": [
+          "Campus daily life, assignments and evidence passports"
+        ],
+        "summary": "Grade",
+        "operationId": "grade_api_campus_assignments_submissions__submission_id__review_put",
+        "parameters": [
+          {
+            "name": "submission_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Submission Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GradeInput"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/campus/passport": {
+      "get": {
+        "tags": [
+          "Campus daily life, assignments and evidence passports"
+        ],
+        "summary": "Passport",
+        "operationId": "passport_api_campus_passport_get",
+        "parameters": [
+          {
+            "name": "student_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Student Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/campus/passport/shares": {
+      "get": {
+        "tags": [
+          "Campus daily life, assignments and evidence passports"
+        ],
+        "summary": "Shares",
+        "operationId": "shares_api_campus_passport_shares_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Campus daily life, assignments and evidence passports"
+        ],
+        "summary": "Share Passport",
+        "operationId": "share_passport_api_campus_passport_shares_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ShareInput"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/campus/passport/shares/{share_id}": {
+      "delete": {
+        "tags": [
+          "Campus daily life, assignments and evidence passports"
+        ],
+        "summary": "Revoke Share",
+        "operationId": "revoke_share_api_campus_passport_shares__share_id__delete",
+        "parameters": [
+          {
+            "name": "share_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Share Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/campus/passport/shared/{token}": {
+      "get": {
+        "tags": [
+          "Campus daily life, assignments and evidence passports"
+        ],
+        "summary": "Public Passport",
+        "operationId": "public_passport_api_campus_passport_shared__token__get",
+        "parameters": [
+          {
+            "name": "token",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Token"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/campus/privacy/activity": {
+      "get": {
+        "tags": [
+          "Campus daily life, assignments and evidence passports"
+        ],
+        "summary": "Privacy Activity",
+        "operationId": "privacy_activity_api_campus_privacy_activity_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/campus/automations": {
+      "get": {
+        "tags": [
+          "Campus daily life, assignments and evidence passports"
+        ],
+        "summary": "Automation Settings",
+        "operationId": "automation_settings_api_campus_automations_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Campus daily life, assignments and evidence passports"
+        ],
+        "summary": "Configure Automation",
+        "operationId": "configure_automation_api_campus_automations_put",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AutomationInput"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/campus/automations/run": {
+      "post": {
+        "tags": [
+          "Campus daily life, assignments and evidence passports"
+        ],
+        "summary": "Run Automation",
+        "operationId": "run_automation_api_campus_automations_run_post",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/campus/evidence-map": {
+      "get": {
+        "tags": [
+          "Campus daily life, assignments and evidence passports"
+        ],
+        "summary": "Evidence Map",
+        "operationId": "evidence_map_api_campus_evidence_map_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/campus/translation-draft": {
+      "post": {
+        "tags": [
+          "Campus daily life, assignments and evidence passports"
+        ],
+        "summary": "Translate",
+        "operationId": "translate_api_campus_translation_draft_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TranslationInput"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/campus/fees": {
+      "get": {
+        "tags": [
+          "Fee invoices, payments and receipts"
+        ],
+        "summary": "Invoices",
+        "operationId": "invoices_api_campus_fees_get",
+        "parameters": [
+          {
+            "name": "q",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "default": "",
+              "title": "Q"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/campus/fees/plans/preview": {
+      "post": {
+        "tags": [
+          "Fee invoices, payments and receipts"
+        ],
+        "summary": "Preview",
+        "operationId": "preview_api_campus_fees_plans_preview_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PlanInput"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/campus/fees/plans": {
+      "post": {
+        "tags": [
+          "Fee invoices, payments and receipts"
+        ],
+        "summary": "Issue",
+        "operationId": "issue_api_campus_fees_plans_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PlanInput"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/campus/fees/export": {
+      "get": {
+        "tags": [
+          "Fee invoices, payments and receipts"
+        ],
+        "summary": "Export",
+        "operationId": "export_api_campus_fees_export_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/campus/fees/{invoice_id}/orders": {
+      "post": {
+        "tags": [
+          "Fee invoices, payments and receipts"
+        ],
+        "summary": "Create Order",
+        "operationId": "create_order_api_campus_fees__invoice_id__orders_post",
+        "parameters": [
+          {
+            "name": "invoice_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Invoice Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OrderInput"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/campus/fees/orders/{order_id}/demo-complete": {
+      "post": {
+        "tags": [
+          "Fee invoices, payments and receipts"
+        ],
+        "summary": "Demo Complete",
+        "operationId": "demo_complete_api_campus_fees_orders__order_id__demo_complete_post",
+        "parameters": [
+          {
+            "name": "order_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Order Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/campus/fees/orders/{order_id}/verify": {
+      "post": {
+        "tags": [
+          "Fee invoices, payments and receipts"
+        ],
+        "summary": "Verify",
+        "operationId": "verify_api_campus_fees_orders__order_id__verify_post",
+        "parameters": [
+          {
+            "name": "order_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Order Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/VerifyInput"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/campus/fees/orders/{order_id}/refresh": {
+      "post": {
+        "tags": [
+          "Fee invoices, payments and receipts"
+        ],
+        "summary": "Refresh Payment",
+        "operationId": "refresh_payment_api_campus_fees_orders__order_id__refresh_post",
+        "parameters": [
+          {
+            "name": "order_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Order Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/campus/fees/webhook": {
+      "post": {
+        "tags": [
+          "Fee invoices, payments and receipts"
+        ],
+        "summary": "Webhook",
+        "operationId": "webhook_api_campus_fees_webhook_post",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/campus/fees/orders/{order_id}/reconcile": {
+      "post": {
+        "tags": [
+          "Fee invoices, payments and receipts"
+        ],
+        "summary": "Reconcile",
+        "operationId": "reconcile_api_campus_fees_orders__order_id__reconcile_post",
+        "parameters": [
+          {
+            "name": "order_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Order Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ReconcileInput"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/campus/fees/{invoice_id}/void": {
+      "post": {
+        "tags": [
+          "Fee invoices, payments and receipts"
+        ],
+        "summary": "Void",
+        "operationId": "void_api_campus_fees__invoice_id__void_post",
+        "parameters": [
+          {
+            "name": "invoice_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Invoice Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/VoidInput"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/campus/fees/receipts/{order_id}": {
+      "get": {
+        "tags": [
+          "Fee invoices, payments and receipts"
+        ],
+        "summary": "Receipt",
+        "operationId": "receipt_api_campus_fees_receipts__order_id__get",
+        "parameters": [
+          {
+            "name": "order_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Order Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -4532,6 +5571,33 @@
         ],
         "title": "AuthorityInput"
       },
+      "AutomationInput": {
+        "properties": {
+          "enabled": {
+            "type": "boolean",
+            "title": "Enabled",
+            "default": true
+          },
+          "assignments": {
+            "type": "boolean",
+            "title": "Assignments",
+            "default": true
+          },
+          "fees": {
+            "type": "boolean",
+            "title": "Fees",
+            "default": true
+          },
+          "evidence": {
+            "type": "boolean",
+            "title": "Evidence",
+            "default": true
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "title": "AutomationInput"
+      },
       "Body_preview_api_imports_preview_post": {
         "properties": {
           "file": {
@@ -4599,6 +5665,30 @@
           "payload"
         ],
         "title": "Body_publish_api_campus_posts_post"
+      },
+      "Body_submit_api_campus_assignments__post_id__submit_post": {
+        "properties": {
+          "content": {
+            "type": "string",
+            "maxLength": 20000,
+            "title": "Content",
+            "default": ""
+          },
+          "file": {
+            "anyOf": [
+              {
+                "type": "string",
+                "contentMediaType": "application/octet-stream"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "File"
+          }
+        },
+        "type": "object",
+        "title": "Body_submit_api_campus_assignments__post_id__submit_post"
       },
       "Body_upload_api_evidence_documents_post": {
         "properties": {
@@ -4742,6 +5832,29 @@
           "name"
         ],
         "title": "CompanyInput"
+      },
+      "Criterion": {
+        "properties": {
+          "label": {
+            "type": "string",
+            "maxLength": 100,
+            "minLength": 2,
+            "title": "Label"
+          },
+          "maximum": {
+            "type": "integer",
+            "maximum": 100.0,
+            "minimum": 1.0,
+            "title": "Maximum"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "label",
+          "maximum"
+        ],
+        "title": "Criterion"
       },
       "DepartmentInput": {
         "properties": {
@@ -4985,6 +6098,44 @@
         ],
         "title": "GoalInput"
       },
+      "GradeInput": {
+        "properties": {
+          "marks": {
+            "items": {
+              "type": "integer"
+            },
+            "type": "array",
+            "maxItems": 10,
+            "title": "Marks"
+          },
+          "feedback": {
+            "type": "string",
+            "maxLength": 5000,
+            "minLength": 5,
+            "title": "Feedback"
+          },
+          "decision": {
+            "type": "string",
+            "enum": [
+              "graded",
+              "returned"
+            ],
+            "title": "Decision",
+            "default": "graded"
+          },
+          "verify_skills": {
+            "type": "boolean",
+            "title": "Verify Skills",
+            "default": false
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "feedback"
+        ],
+        "title": "GradeInput"
+      },
       "HTTPValidationError": {
         "properties": {
           "detail": {
@@ -5084,6 +6235,114 @@
           "feedback"
         ],
         "title": "ManualMark"
+      },
+      "OrderInput": {
+        "properties": {
+          "idempotency_key": {
+            "type": "string",
+            "maxLength": 80,
+            "minLength": 16,
+            "pattern": "^[a-zA-Z0-9_-]+$",
+            "title": "Idempotency Key"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "idempotency_key"
+        ],
+        "title": "OrderInput"
+      },
+      "PlanInput": {
+        "properties": {
+          "reference": {
+            "type": "string",
+            "maxLength": 80,
+            "minLength": 3,
+            "pattern": "^[a-zA-Z0-9_-]+$",
+            "title": "Reference"
+          },
+          "title": {
+            "type": "string",
+            "maxLength": 200,
+            "minLength": 3,
+            "title": "Title"
+          },
+          "category": {
+            "type": "string",
+            "enum": [
+              "tuition",
+              "exam",
+              "hostel",
+              "transport",
+              "other"
+            ],
+            "title": "Category",
+            "default": "tuition"
+          },
+          "term": {
+            "type": "string",
+            "maxLength": 80,
+            "minLength": 2,
+            "title": "Term"
+          },
+          "amount_paise": {
+            "type": "integer",
+            "maximum": 100000000.0,
+            "minimum": 100.0,
+            "title": "Amount Paise"
+          },
+          "due_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Due At"
+          },
+          "audience": {
+            "$ref": "#/components/schemas/Audience"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "reference",
+          "title",
+          "term",
+          "amount_paise",
+          "due_at"
+        ],
+        "title": "PlanInput"
+      },
+      "PolicyInput": {
+        "properties": {
+          "rubric": {
+            "items": {
+              "$ref": "#/components/schemas/Criterion"
+            },
+            "type": "array",
+            "maxItems": 10,
+            "minItems": 1,
+            "title": "Rubric"
+          },
+          "skills": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "maxItems": 10,
+            "title": "Skills"
+          },
+          "allow_late": {
+            "type": "boolean",
+            "title": "Allow Late",
+            "default": false
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "rubric"
+        ],
+        "title": "PolicyInput"
       },
       "PostInput": {
         "properties": {
@@ -5288,6 +6547,22 @@
         ],
         "title": "QuestionInput"
       },
+      "ReconcileInput": {
+        "properties": {
+          "payment_id": {
+            "type": "string",
+            "maxLength": 100,
+            "pattern": "^pay_[A-Za-z0-9]+$",
+            "title": "Payment Id"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "payment_id"
+        ],
+        "title": "ReconcileInput"
+      },
       "RequirementInput": {
         "properties": {
           "title": {
@@ -5423,6 +6698,37 @@
         ],
         "title": "SetupInput"
       },
+      "ShareInput": {
+        "properties": {
+          "evidence_ids": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "maxItems": 50,
+            "minItems": 1,
+            "title": "Evidence Ids"
+          },
+          "hours": {
+            "type": "integer",
+            "maximum": 168.0,
+            "minimum": 1.0,
+            "title": "Hours",
+            "default": 24
+          },
+          "consent": {
+            "type": "boolean",
+            "title": "Consent"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "evidence_ids",
+          "consent"
+        ],
+        "title": "ShareInput"
+      },
       "StaffAccess": {
         "properties": {
           "role": {
@@ -5549,6 +6855,22 @@
         ],
         "title": "TaskInput"
       },
+      "TranslationInput": {
+        "properties": {
+          "text": {
+            "type": "string",
+            "maxLength": 4000,
+            "minLength": 1,
+            "title": "Text"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "text"
+        ],
+        "title": "TranslationInput"
+      },
       "ValidationError": {
         "properties": {
           "loc": {
@@ -5588,6 +6910,52 @@
           "type"
         ],
         "title": "ValidationError"
+      },
+      "VerifyInput": {
+        "properties": {
+          "razorpay_payment_id": {
+            "type": "string",
+            "maxLength": 100,
+            "pattern": "^pay_[A-Za-z0-9]+$",
+            "title": "Razorpay Payment Id"
+          },
+          "razorpay_order_id": {
+            "type": "string",
+            "maxLength": 100,
+            "pattern": "^order_[A-Za-z0-9]+$",
+            "title": "Razorpay Order Id"
+          },
+          "razorpay_signature": {
+            "type": "string",
+            "maxLength": 64,
+            "minLength": 64,
+            "title": "Razorpay Signature"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "razorpay_payment_id",
+          "razorpay_order_id",
+          "razorpay_signature"
+        ],
+        "title": "VerifyInput"
+      },
+      "VoidInput": {
+        "properties": {
+          "reason": {
+            "type": "string",
+            "maxLength": 1000,
+            "minLength": 10,
+            "title": "Reason"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "reason"
+        ],
+        "title": "VoidInput"
       },
       "WorkflowInput": {
         "properties": {

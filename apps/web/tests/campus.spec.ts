@@ -1,14 +1,7 @@
 import { test, expect, type Page } from "@playwright/test";
+import { signIn } from "./auth";
 async function login(page: Page, id: string) {
-  await page.goto("/login");
-  await page
-    .getByLabel("Institution code", { exact: true })
-    .fill(process.env.CM_E2E_INSTITUTION!);
-  await page.getByLabel("Roll number or staff email").fill(id);
-  await page
-    .getByLabel("Password", { exact: true })
-    .fill(process.env.CM_E2E_PASSWORD!);
-  await page.getByRole("button", { name: "Sign in securely" }).click();
+  await signIn(page, id);
   await expect(page).toHaveURL(
     ["STUDENT", "TEACHER", "JUNIOR"].includes(id) ? /\/app\/campus$/ : /\/app$/,
   );

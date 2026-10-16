@@ -1,12 +1,42 @@
+import asyncio
+import logging
+from contextlib import asynccontextmanager, suppress
 from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
 from fastapi.exceptions import RequestValidationError
 from sqlalchemy.exc import IntegrityError
 from .config import settings
-from .routers import auth, imports, students, drives, institution, learning, evidence, insights, bootstrap, campus
+from .routers import auth, imports, students, drives, institution, learning, evidence, insights, bootstrap, campus, campus_life, fees
 from .middleware import BoundedBodyMiddleware
 
-app = FastAPI(title="CampusMind AI", version="0.1.0", description="Tenant-isolated CollegeOps and PlacementOS. No LLM required.")
+
+@asynccontextmanager
+async def lifespan(app):
+    async def reminders():
+        from .campus_services import automatic_tick
+
+        while True:
+            await asyncio.sleep(max(30, settings().automation_interval_seconds))
+            try:
+                await asyncio.to_thread(automatic_tick)
+            except Exception:
+                # No document content, payment secrets or student data enters logs.
+                logging.getLogger("campusmind.automation").warning("Campus reminder sweep failed; will retry next interval.")
+
+    task = asyncio.create_task(reminders()) if settings().automation_enabled and not settings().testing else None
+    yield
+    if task:
+        task.cancel()
+        with suppress(asyncio.CancelledError):
+            await task
+
+
+app = FastAPI(
+    title="CampusMind AI",
+    version="0.2.0",
+    description="Tenant-isolated CollegeOps, Campus Hub and PlacementOS. No LLM required.",
+    lifespan=lifespan,
+)
 app.add_middleware(BoundedBodyMiddleware)
 
 
@@ -57,5 +87,7 @@ for router in (
     insights.router,
     bootstrap.router,
     campus.router,
+    campus_life.router,
+    fees.router,
 ):
     app.include_router(router, prefix="/api")

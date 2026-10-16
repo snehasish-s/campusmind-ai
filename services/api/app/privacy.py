@@ -9,6 +9,17 @@ from .intelligence.workflows import checkpointer
 
 
 def erase_student(db, student):
+    for entry in db.scalars(select(m.AssignmentSubmission).where(m.AssignmentSubmission.user_id == student.id)):
+        if entry.storage_key:
+            get_storage().delete(entry.storage_key)
+        db.delete(entry)
+    db.execute(delete(m.PassportShare).where(m.PassportShare.user_id == student.id))
+    db.execute(delete(m.AutomationDelivery).where(m.AutomationDelivery.user_id == student.id))
+    for plan in db.scalars(select(m.FeePlan).where(m.FeePlan.institution_id == student.institution_id)):
+        if plan.audience.get("student_id") == student.id or plan.audience.get("student_roll_no", "").upper() == student.roll_no.upper():
+            plan.audience = {"redacted_after_erasure": True}
+    # Accounting entries remain attached to a pseudonymous account for reconciliation.
+    # They contain no copied student name/email. Institutional retention policy governs them.
     active_jobs = db.scalars(
         select(m.ImportJob).where(m.ImportJob.institution_id == student.institution_id, m.ImportJob.status.in_(["queued", "running"]))
     )
@@ -68,6 +79,7 @@ def erase_student(db, student):
                 post.storage_key = None
             post.message = "Removed following student erasure request."
             post.title = "Removed private update"
+            post.audience = {}
             post.withdrawn = True
     student.full_name = "Deleted student account"
     student.email = secrets.token_hex(16) + "@deleted.invalid"

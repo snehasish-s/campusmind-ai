@@ -36,6 +36,10 @@ import {
   ScrollText,
   UserRound,
   Compass,
+  CalendarDays,
+  CreditCard,
+  Fingerprint,
+  Workflow,
 } from "lucide-react";
 import { api, ApiError, send, type User } from "@/lib/api";
 import { Brand } from "./brand";
@@ -63,10 +67,20 @@ import { AnalyticsPage, EvidencePage } from "./workspace/insights";
 import { TasksPage } from "./workspace/governance";
 import { toast } from "sonner";
 import { CampusHub } from "./workspace/campus";
+import {
+  TodayPage,
+  AssignmentsPage,
+  PassportPage,
+  AutomationsPage,
+  EvidenceMapPage,
+} from "./workspace/campus-life";
+import { FeesPage } from "./workspace/fees";
+import { CampusAlerts } from "./workspace/campus-alerts";
 
 const campusLinks = [
   ["campus", "Campus Hub", MessagesSquare],
   ["timetable", "My timetable", BookOpen],
+  ["assignments", "Assignments & feedback", ClipboardCheck],
 ] as const;
 const staffLinks = [
   ["placement", "Overview", LayoutDashboard],
@@ -100,8 +114,11 @@ const collegeLinks = [
   ["evidence-reports", "Evidence reports", FileBarChart2],
   ["tasks", "Institutional tasks", ListChecks],
   ["review", "Review & approval", ClipboardCheck],
+  ["evidence-map", "Evidence relationships", Layers],
 ] as const;
 const adminLinks = [
+  ["fees", "Fees & collections", CreditCard],
+  ["automations", "Campus automation", Workflow],
   ["departments", "Departments", Layers],
   ["staff", "Staff & roles", Users],
   ["collegeops", "CollegeOps", Building2],
@@ -166,9 +183,18 @@ export function Workspace() {
       "evidence-reports",
       "tasks",
       "review",
+      "evidence-map",
     ].includes(section);
   const campus =
-    ["campus", "timetable"].includes(section) ||
+    [
+      "campus",
+      "timetable",
+      "today",
+      "assignments",
+      "passport",
+      "fees",
+      "automations",
+    ].includes(section) ||
     (["student", "faculty", "campus_staff"].includes(user.role) &&
       ["", "profile", "notifications", "settings"].includes(section));
   const canPlacement = user.placement_access.allowed;
@@ -181,8 +207,22 @@ export function Workspace() {
         : "PlacementOS";
   const links = campus
     ? student
-      ? [...campusLinks, ["profile", "My profile", UserRound] as const]
-      : campusLinks
+      ? [
+          ["today", "Today", CalendarDays] as const,
+          ...campusLinks,
+          ["passport", "My skill passport", Fingerprint] as const,
+          ["fees", "Fees & receipts", CreditCard] as const,
+          ["profile", "My profile", UserRound] as const,
+        ]
+      : [
+          ...campusLinks,
+          ...(admin
+            ? [
+                ["fees", "Fees & collections", CreditCard] as const,
+                ["automations", "Campus automation", Workflow] as const,
+              ]
+            : []),
+        ]
     : student
       ? studentLinks
       : college
@@ -204,10 +244,16 @@ export function Workspace() {
       ...collegeLinks,
       ["notifications", "Notifications"],
       ["settings", "Settings"],
+      ["today", "Today"],
+      ["passport", "My skill passport"],
+      ["fees", "Fees & receipts"],
+      ["automations", "Campus automation"],
     ].find(([id]) => id === section)?.[1] || "Workspace";
   async function logout() {
     try {
       await send("/auth/logout");
+      localStorage.removeItem("cm-offline-timetable");
+      localStorage.removeItem("cm-notifications");
       client.clear();
       router.push("/login");
     } catch (e) {
@@ -310,7 +356,10 @@ export function Workspace() {
               <div className="nav-label">Institution</div>
               {nav(
                 admin
-                  ? adminLinks
+                  ? adminLinks.filter(
+                      ([id]) =>
+                        !campus || !["fees", "automations"].includes(id),
+                    )
                   : adminLinks.filter(([id]) =>
                       ["collegeops", "documents"].includes(id),
                     ),
@@ -365,6 +414,7 @@ export function Workspace() {
         </div>
       </aside>
       <div className="app-main">
+        <CampusAlerts userId={user.id} />
         <header className="topbar">
           <div className="row">
             <Button
@@ -463,6 +513,13 @@ export function Workspace() {
 function Page({ section, user }: { section: string; user: User }) {
   const admin = ["institution_admin", "platform_admin"].includes(user.role),
     student = user.role === "student";
+  if (section === "today" && student) return <TodayPage user={user} />;
+  if (section === "assignments") return <AssignmentsPage user={user} />;
+  if (section === "passport" && student) return <PassportPage />;
+  if (section === "fees" && (student || admin)) return <FeesPage user={user} />;
+  if (section === "automations" && admin) return <AutomationsPage />;
+  if (section === "evidence-map" && (admin || user.role === "hod"))
+    return <EvidenceMapPage />;
   if (
     ["campus", "timetable"].includes(section) ||
     (["faculty", "campus_staff"].includes(user.role) && section === "")

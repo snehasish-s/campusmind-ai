@@ -56,3 +56,11 @@ Local Compose runs PostgreSQL, Redis/RQ and Mailpit. An optional AI profile adds
 Render Free uses one container with a public Next.js process and a loopback FastAPI process. All durable records/checkpoints live in Supabase PostgreSQL and files in its private bucket. Hosted rate limits are database-backed. No free background worker or local model is assumed; synchronous imports and keyword/deterministic intelligence remain usable. The startup supervisor terminates the sibling process if either server fails. Free-host memory, timeout and availability limits remain deployment constraints, not a production SLA.
 
 See DIAGRAMS.md, API.md, SECURITY.md and DEPLOYMENT.md for the ER model, contract, safeguards and configuration.
+
+## Campus actions and finance extension
+
+`campus_services.py` builds explainable daily actions from academic cohorts, posts, timetable, invoices, assessments and accepted learning records. An API lifespan task runs durable idempotent reminders; unique delivery keys and PostgreSQL row locks prevent duplicates. Sleeping hosts catch up on wake-up. This is a bounded deterministic service, with no model deciding official recipients or financial amounts.
+
+Assignment policies freeze at first submission. Versioned work snapshots the rubric and mapped skills. Faculty verification records reviewer/submission provenance; corrected reviews supersede prior evidence and trigger optional placement-plan proposals. The passport only exposes selected fields through a consented hashed expiring token. Institutional and student permissions remain server-enforced.
+
+Finance records use integer paise. Invoices snapshot cohort membership. Orders are unique by invoice/provider/environment. Browser HMAC, provider-side capture checks, signed webhooks, database locks and idempotent events protect settlement. Test/live environments are separate and test payments remain financially outstanding. The optional global merchant credentials are explicitly bound to one institution. No card/bank credentials are stored. See CAMPUS_LIFE_AND_FEES.md for operations and real-payment boundaries.

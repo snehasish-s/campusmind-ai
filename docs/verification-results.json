@@ -1,74 +1,39 @@
 {
-  "recorded_at_utc": "2026-10-16T06:45:52.874917+00:00",
+  "recorded_at_utc": "2026-10-16T10:48:16.145525+00:00",
   "backend": {
-    "tests": 37,
+    "tests": 45,
     "failures": 0,
     "errors": 0,
     "skipped": 0,
-    "time": 100.441
+    "time": 148.008
   },
   "browser": {
-    "tests": 14,
+    "tests": 18,
     "failures": 0,
     "errors": 0,
     "skipped": 0,
-    "time": 81.638519
-  },
-  "npm_advisories": {
-    "info": 0,
-    "low": 0,
-    "moderate": 0,
-    "high": 0,
-    "critical": 0,
-    "total": 0
+    "time": 85.891359
   },
   "verified_checks": [
     "Next.js production build",
     "TypeScript typecheck",
     "ESLint",
     "Ruff",
-    "Alembic upgrade/check on local SQLite",
+    "Local SQLite Alembic upgrade/check",
     "PostgreSQL migrations compiled to offline SQL",
     "Base and AI Docker Compose configuration validation",
     "pip check",
-    "Python startup-script compilation",
-    "Synthetic benchmark",
-    "Retention dry run"
+    "Synthetic campus seed executed twice without resetting accounts"
   ],
   "not_verified": [
-    "Live PostgreSQL server and distributed Redis/RQ/Mailpit stack: Docker Linux engine unavailable",
-    "Real Ollama inference and Sentence Transformers weights: not downloaded",
-    "Remote Qdrant server: in-process adapter tested with controlled vectors only",
-    "Supabase and Render accounts: credentials intentionally blank; no deployment"
+    "Actual merchant checkout, refunds and bank settlement; gateway HTTP transport was mocked in API tests",
+    "Live PostgreSQL concurrency and distributed worker load",
+    "Background Web Push (not implemented)",
+    "Ollama translation quality; manual/unavailable fallback tested",
+    "This local extension has not been deployed to Render"
   ],
   "sources": [
     "data/backend-results.xml",
-    "apps/web/test-results/browser-results.xml",
-    "docs/evaluation-results.json",
-    "docs/npm-audit.json"
-  ],
-  "campus_hub": {
-    "backend_cases": 6,
-    "browser_cases": 2,
-    "openapi_paths": 98,
-    "features": [
-      "cohort and timetable CSV/XLSX imports",
-      "targeted official updates",
-      "private attachments",
-      "subject teacher authorization",
-      "read acknowledgements",
-      "leadership publishing authority"
-    ]
-  },
-  "workspace_separation": {
-    "backend_access_cases": 7,
-    "browser_cases": 2,
-    "student_placement_years": [
-      3,
-      4
-    ],
-    "student_default": "/app/campus",
-    "placement_entry": "/app/placement",
-    "unknown_year": "denied_pending_institution_assignment"
-  }
+    "apps/web/test-results/browser-results.xml"
+  ]
 }

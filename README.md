@@ -1,5 +1,7 @@
 # CampusMind AI
 
+Campus Hub now includes a unified **Today** dashboard, assignment submissions and faculty feedback, evidence passports, automatic deadline reminders, fee invoices and payment receipts, evidence relationships, optional Odia translation drafts and an offline timetable PWA. See [Campus life and payments](docs/CAMPUS_LIFE_AND_FEES.md) for upgrade, demo and merchant setup. Payments default to a free local simulator.
+
 CampusMind CollegeOps + PlacementOS is an implemented local-first Next.js/FastAPI application with institution-scoped records, bulk onboarding, resumes, recruitment, approved assessments, preparation roadmaps and an institutional evidence assistant. All demonstration records are synthetic. No paid AI API or software subscription is required.
 
 The existing Phase 1 application has been extended incrementally. Supabase PostgreSQL/private Storage and Render Free deployment files are included; **no cloud account has been connected or deployed**. Insert credentials privately using [the hosted worksheet](.env.hosted.example) and [deployment guide](docs/DEPLOYMENT.md).

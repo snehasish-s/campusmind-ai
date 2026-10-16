@@ -1,9 +1,13 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { MotionConfig } from "motion/react";
 import { Toaster } from "sonner";
 export function Providers({ children }: { children: React.ReactNode }) {
+  useEffect(() => {
+    if ("serviceWorker" in navigator)
+      void navigator.serviceWorker.register("/sw.js").catch(() => {});
+  }, []);
   const [client] = useState(
     () =>
       new QueryClient({

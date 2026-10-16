@@ -143,8 +143,8 @@ def gap_analysis(db, user, drive=None):
     comparisons = []
     for requirement in requested:
         name = requirement["skill"]
-        records = [e for e in evidence if e["skill"] == name and e.get("status") not in {"rejected", "challenged"}]
-        demonstrated = [e for e in records if e.get("evidence_type") == "assessment_verified"]
+        records = [e for e in evidence if e["skill"] == name and e.get("status") not in {"rejected", "challenged", "superseded"}]
+        demonstrated = [e for e in records if e.get("evidence_type") in {"assessment_verified", "faculty_verified"}]
         claims = [e for e in records if e.get("evidence_type") in {"resume_claim", "student_claim"} and not e.get("ambiguous")]
         value = 1.0 if demonstrated else 0.35 if claims else 0.0
         state = (
@@ -185,8 +185,8 @@ def gap_analysis(db, user, drive=None):
         "role": role,
         "skills": comparisons,
         "alignment_score": score,
-        "score_explanation": "Evidence coverage only: approved assessment evidence = 1.0; unambiguous unverified claim = 0.35; missing or ambiguous evidence = 0.0. Equal weighting of required skills. Not hiring eligibility or placement probability.",
-        "method": "deterministic_evidence_coverage_v1",
+        "score_explanation": "Evidence coverage only: approved assessment or faculty-reviewed assignment evidence = 1.0; unambiguous unverified claim = 0.35; missing or ambiguous evidence = 0.0. Equal weighting of required skills. Not hiring eligibility or placement probability.",
+        "method": "deterministic_evidence_coverage_v2",
         "fingerprint": fingerprint,
         "eligibility": objective_eligibility(db, user, drive) if drive else None,
         "strengths": [c["skill"] for c in comparisons if c["state"] == "demonstrated"],

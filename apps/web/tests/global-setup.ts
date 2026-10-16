@@ -13,9 +13,14 @@ export default function setup() {
         ? ".venv/Scripts/python.exe"
         : ".venv/bin/python",
     );
-  execFileSync(python, ["scripts/browser_seed.py"], {
-    cwd: root,
-    env: process.env,
-    stdio: "pipe",
-  });
+  for (const project of ["desktop", "mobile"]) {
+    execFileSync(python, ["scripts/browser_seed.py"], {
+      cwd: root,
+      env: {
+        ...process.env,
+        CM_E2E_INSTITUTION: `${process.env.CM_E2E_INSTITUTION}-${project}`,
+      },
+      stdio: "pipe",
+    });
+  }
 }
